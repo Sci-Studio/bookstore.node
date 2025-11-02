@@ -1,4 +1,4 @@
-# bookstore..node
+# bookstore.node
 This the backend program using nodejs
 
 # To Run Project for first time

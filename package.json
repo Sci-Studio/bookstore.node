@@ -4,9 +4,9 @@
   "description": "API and Backend for demo bookstore",
   "main": "src/index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec \"npx ts-node --project tsconfig.json src/index.js\"",
+    "dev": "nodemon --watch src --exec \"npx ts-node --project tsconfig.json src/index.ts\"",
     "build": "prisma generate && tsc",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "generate": "prisma generate",
     "migrate": "prisma migrate dev --name init",
     "seed": "npm run generate && ts-node scripts/seed.ts",
@@ -29,6 +29,9 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.9.2",
     "nodemon": "^3.1.10",
     "prisma": "^6.18.0",
     "ts-node": "^10.9.2",
