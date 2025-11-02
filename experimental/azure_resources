@@ -1,0 +1,46 @@
+# Login & sub
+az login
+az account set --subscription YOUR_SUBSCRIPTION
+
+
+# 1) Resource group
+az group create -n YOUR_RG -l westeurope
+
+
+# 2) PostgreSQL Flexible Server (basic dev tier)
+az postgres flexible-server create \
+-g YOUR_RG -n YOUR_DB -u pgadmin -p "P@ssw0rd!" \
+--tier Burstable --sku-name Standard_B1ms --storage-size 32 --version 16 \
+--location westeurope --public-access 0.0.0.0-255.255.255.255
+
+
+# (Optional) restrict public access later to your outbound IPs or use VNet integration
+
+
+# 3) App Insights (for API)
+az monitor app-insights component create \
+--app YOUR_API_APP-ai --location westeurope -g YOUR_RG
+
+
+# 4) App Services (Linux)
+az appservice plan create -g YOUR_RG -n YOUR_PLAN --sku B1 --is-linux
+az webapp create -g YOUR_RG -p YOUR_PLAN -n YOUR_API_APP --runtime "NODE|20-lts"
+az webapp create -g YOUR_RG -p YOUR_PLAN -n YOUR_WEB_APP --runtime "NODE|20-lts"
+
+
+# 5) Configure API settings
+DB_HOST=$(az postgres flexible-server show -g YOUR_RG -n YOUR_DB --query fullyQualifiedDomainName -o tsv)
+az webapp config appsettings set -g YOUR_RG -n YOUR_API_APP --settings \
+DATABASE_URL="postgresql://pgadmin:P@ssw0rd!@${DB_HOST}:5432/postgres?sslmode=require" \
+PORT=8080 \
+APPINSIGHTS_INSTRUMENTATIONKEY=$(az monitor app-insights component show -g YOUR_RG --app YOUR_API_APP-ai --query instrumentationKey -o tsv)
+
+
+# 6) Point web to API
+API_URL="https://YOUR_API_APP.azurewebsites.net"
+az webapp config appsettings set -g YOUR_RG -n YOUR_WEB_APP --settings \
+VITE_API_BASE="$API_URL"
+
+
+# 7) CORS on API (allow web origin)
+az webapp cors add -g YOUR_RG -n YOUR_API_APP --allowed-origins "https://YOUR_WEB_APP.azurewebsites.net"
