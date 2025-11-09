@@ -44,6 +44,7 @@ echo "▶️ Creating blob container..."
 az storage container create \
   --name $CONTAINER_NAME \
   --account-name $STORAGE_NAME \
+  --account-key $STORAGE_KEY \
   --auth-mode key \
   --public-access blob
 
