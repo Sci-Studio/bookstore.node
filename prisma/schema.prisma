@@ -13,4 +13,5 @@ model Book {
   author     String
   priceCents Int
   createdAt  DateTime @default(now())
+  imageUrl   String?
 }
